@@ -31,20 +31,21 @@ async function run() {
         
         const toyCollection = client.db('zoomieToys').collection('toys');
 
+        // Get all toys:
         app.get('/toys', async (req, res) => {
             const cursor = toyCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         })
 
+        // Get category wise toys:
         app.get('/toys/:category', async (req, res) => {
             const category = req.params.category;
             const query = { subCategory: category };
-            const cursor = toyCollection.find(query);
+            const cursor = toyCollection.find(query).limit(3); // Set limit to 3
             const result = await cursor.toArray();
             res.send(result);
-
-        })
+        });
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
