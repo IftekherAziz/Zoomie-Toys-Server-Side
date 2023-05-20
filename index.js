@@ -66,7 +66,7 @@ async function run() {
             if (req.query?.email) {
                 query = { sellerEmail: req.query.email }
             }
-            const result = await toyCollection.find(query).sort({ _id: -1 }).limit(20).toArray();
+            const result = await toyCollection.find(query).sort({ _id: -1 }).toArray();
             res.send(result);
         })
 
