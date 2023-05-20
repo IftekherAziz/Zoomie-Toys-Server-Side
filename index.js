@@ -27,8 +27,8 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
-        
-        
+
+
         const toyCollection = client.db('zoomieToys').collection('toys');
 
         // Get all toys:
@@ -58,7 +58,7 @@ async function run() {
             const result = await toyCollection.findOne(filter);
             res.send(result);
         })
-        
+
         // Add a new Toy:
         app.post('/addToy', async (req, res) => {
             const data = req.body;
@@ -66,7 +66,15 @@ async function run() {
             res.send(result);
         })
 
+        // Get toy by user enmail:
+        app.get('/myToys/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { sellerEmail: email };        
+            const result = await toyCollection.find(query).limit(20).toArray();
+            res.send(result);
 
+        })
+       
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
