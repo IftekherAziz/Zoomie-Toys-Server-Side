@@ -27,17 +27,11 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
-
-
         const toyCollection = client.db('zoomieToys').collection('toys');
 
         // Get all toys:
-        app.get('/toys', async (req, res) => {
-            const searchQuery = req.query.search || ''; // Get search query from request query parameter
-            const regex = new RegExp(searchQuery, 'i'); // Create case-insensitive regular expression
-            const query = searchQuery ? { toyName: regex } : {}; // Create query object with regex if search query exists
-
-            const cursor = toyCollection.find(query).sort({ _id: -1 }).limit(20); // Limit results to 20 by default
+        app.get('/toys', async (req, res) => {       
+            const cursor = toyCollection.find().sort({ _id: -1 }).limit(20); 
             const toys = await cursor.toArray();
             res.send(toys);
         });
@@ -46,7 +40,7 @@ async function run() {
         app.get('/toys/:category', async (req, res) => {
             const category = req.params.category;
             const query = { subCategory: category };
-            const cursor = toyCollection.find(query).sort({ _id: -1 }).limit(3); // Sort by _id in descending order (latest first)
+            const cursor = toyCollection.find(query).sort({ _id: -1 }).limit(3); 
             const result = await cursor.toArray();
             res.send(result);
         });
@@ -72,7 +66,7 @@ async function run() {
             if (req.query?.email) {
                 query = { sellerEmail: req.query.email }
             }
-            const result = await toyCollection.find(query).limit(20).toArray();
+            const result = await toyCollection.find(query).sort({ _id: -1 }).limit(20).toArray();
             res.send(result);
         })
 
