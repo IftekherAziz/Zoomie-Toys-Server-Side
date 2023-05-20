@@ -30,8 +30,8 @@ async function run() {
         const toyCollection = client.db('zoomieToys').collection('toys');
 
         // Get all toys:
-        app.get('/toys', async (req, res) => {       
-            const cursor = toyCollection.find().sort({ _id: -1 }).limit(20); 
+        app.get('/toys', async (req, res) => {
+            const cursor = toyCollection.find().sort({ _id: -1 }).limit(20);
             const toys = await cursor.toArray();
             res.send(toys);
         });
@@ -40,7 +40,7 @@ async function run() {
         app.get('/toys/:category', async (req, res) => {
             const category = req.params.category;
             const query = { subCategory: category };
-            const cursor = toyCollection.find(query).sort({ _id: -1 }).limit(3); 
+            const cursor = toyCollection.find(query).sort({ _id: -1 }).limit(3);
             const result = await cursor.toArray();
             res.send(result);
         });
@@ -64,11 +64,23 @@ async function run() {
         app.get('/myToys', async (req, res) => {
             let query = {};
             if (req.query?.email) {
-                query = { sellerEmail: req.query.email }
+                query = { sellerEmail: req.query.email };
             }
-            const result = await toyCollection.find(query).sort({ _id: -1 }).toArray();
-            res.send(result);
-        })
+
+            // Check if a sort parameter is provided
+            if (req.query?.sort) {
+                const sortDirection = req.query.sort.toLowerCase() === 'ascending' ? 1 : -1;
+                const result = await toyCollection
+                    .find(query)
+                    .sort({ price: sortDirection })
+                    .toArray();
+                res.send(result);
+            } else {
+                const result = await toyCollection.find(query).toArray();
+                res.send(result);
+            }
+        });
+
 
         // Update a toy by ID:
         app.patch('/myUpdatedToy/:id', async (req, res) => {
@@ -93,7 +105,7 @@ async function run() {
             res.send(result);
         })
 
-       
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
